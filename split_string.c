@@ -6,6 +6,7 @@
 /**
  * split_string - splits a string into words
  * @s: string to parse
+ * @c: delimeter
  * Return: array of words ending with NULL
  */
 

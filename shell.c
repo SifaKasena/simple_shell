@@ -16,12 +16,10 @@
 int main(void)
 {
 	struct stat st;
-	pid_t child_pid;
 	char *line = NULL;
 	char **envp = environ;
 	char **argv;
 	size_t n = 0;
-	int status;
 
 	while (1)
 	{
@@ -29,6 +27,8 @@ int main(void)
 		if (getline(&line, &n, stdin) == -1)
 			break;
 		line = strtok(line, "\n");
+		if (line == NULL)
+			continue;
 		argv = split_string(line, " ");
 		if (stat(argv[0], &st) == -1)
 		{
@@ -42,26 +42,43 @@ int main(void)
 				continue;
 			}
 		}
-		child_pid = fork();
-		if (child_pid == -1)
+		call_child(argv, envp);
+		free(argv[0]);
+		free(argv);
+	}
+	return (0);
+}
+
+/**
+ * call_child - Executes a command in a child process
+ * @argv: list of arguments the first being the command
+ * @envp: environment variables
+ * Return: always 0 (success) 1 on Error
+ */
+
+int call_child(char **argv, char **envp)
+{
+	int status;
+	pid_t child_pid;
+
+	child_pid = fork();
+	if (child_pid == -1)
+	{
+		perror("./shell");
+		return (1);
+	}
+	if (child_pid == 0)
+	{
+		if (execve(argv[0], argv, envp) == -1)
 		{
 			perror("./shell");
 			return (1);
 		}
-		if (child_pid == 0)
-		{
-			if (execve(argv[0], argv, envp) == -1)
-			{
-				perror("./shell");
-				return (1);
-			}
-		}
-		else
-		{
-			wait(&status);
-		}
-		free(argv[0]);
-		free(argv);
 	}
+	else
+	{
+		wait(&status);
+	}
+
 	return (0);
 }

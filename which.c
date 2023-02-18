@@ -35,27 +35,5 @@ char *_which(char *file)
 		i++;
 	}
 	free(paths);
-	return(pathname);
+	return (pathname);
 }
-/*
-int main(int ac, char **av)
-{
-	int i;
-	char *p;
-
-	if (ac < 2)
-	{
-		printf ("Usage: %s <commands> ...\n", av[0]);
-		return (1);
-	}
-	for (i = 1; i < ac; i++)
-	{
-		p = _which(av[i]);
-		if (p != NULL)
-			printf("%s\n", p);
-		else
-			printf("Not found.\n");
-		free(p);
-	}
-	return (0);
-}*/
