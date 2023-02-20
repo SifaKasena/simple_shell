@@ -16,20 +16,21 @@
 int main(void)
 {
 	struct stat st;
-	char *line = NULL;
+	char *command, *line;
 	char **envp = environ;
 	char **argv;
 	size_t n = 0;
 
 	while (1)
 	{
+		line = NULL;
 		printf("$ ");
 		if (getline(&line, &n, stdin) == -1)
 			break;
-		line = strtok(line, "\n");
-		if (line == NULL)
+		command = strtok(line, "\n");
+		if (command == NULL)
 			continue;
-		argv = split_string(line, " ");
+		argv = split_string(command, " ");
 		if (stat(argv[0], &st) == -1)
 		{
 			if (strcmp(argv[0], "exit") == 0)
@@ -43,9 +44,11 @@ int main(void)
 			}
 		}
 		call_child(argv, envp);
+		free(line);
 		free(argv[0]);
 		free(argv);
 	}
+	free(line);
 	return (0);
 }
 

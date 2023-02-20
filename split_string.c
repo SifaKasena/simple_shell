@@ -12,14 +12,13 @@
 
 char **split_string(char *s, char *c)
 {
-	char *word, **words = malloc(sizeof(*words));
+	char **words = malloc(sizeof(*words));
 	int i = 0;
 
 	if (s == NULL || *s == '\0')
 		return (NULL);
 
-	word = strdup(s);
-	words[i] = strtok(word, c);
+	words[i] = strtok(s, c);
 	while (words[i] != NULL)
 	{
 		i++;

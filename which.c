@@ -15,8 +15,9 @@
 char *_which(char *file)
 {
 	struct stat st;
-	char *pathname;
-	char **paths = split_string(_getenv("PATH"), ":");
+	char *cmd;
+	char *PATH = strdup(getenv("PATH"));
+	char **paths = split_string(PATH, ":");
 	int i = 0;
 
 	while (1)
@@ -26,14 +27,16 @@ char *_which(char *file)
 			free(paths);
 			return (NULL);
 		}
-		pathname = strdup(paths[i]);
-		pathname = strcat(pathname, "/");
-		pathname = strcat(pathname, file);
-		if (stat(pathname, &st) == 0)
+		cmd = strdup(paths[i]);
+		cmd = realloc(cmd, strlen(cmd) + strlen(file) + 3);
+		cmd = strcat(cmd, "/");
+		cmd = strcat(cmd, file);
+		if (stat(cmd, &st) == 0)
 			break;
-		free(pathname);
+		free(cmd);
 		i++;
 	}
+	free(PATH);
 	free(paths);
-	return (pathname);
+	return (cmd);
 }
