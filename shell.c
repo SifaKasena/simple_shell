@@ -15,10 +15,8 @@
 
 int main(void)
 {
-	struct stat st;
-	char *command, *line;
-	char **envp = environ;
-	char **argv;
+	char *line;
+	char **commands;
 	size_t n = 0;
 
 	while (1)
@@ -27,26 +25,13 @@ int main(void)
 		printf("$ ");
 		if (getline(&line, &n, stdin) == -1)
 			break;
-		command = strtok(line, "\n");
-		if (command == NULL)
+		line = _strtok(line, "\n");
+		if (line == NULL)
 			continue;
-		argv = split_string(command, " ");
-		if (stat(argv[0], &st) == -1)
-		{
-			if (strcmp(argv[0], "exit") == 0)
-				break;
-			argv[0] = _which(argv[0]);
-			if (argv[0] == NULL)
-			{
-				free(argv);
-				printf("./shell: No such file\n");
-				continue;
-			}
-		}
-		call_child(argv, envp);
+		commands = split_string(line, ";");
+		call_commands(commands);
 		free(line);
-		free(argv[0]);
-		free(argv);
+		free(commands);
 	}
 	free(line);
 	return (0);
@@ -84,4 +69,42 @@ int call_child(char **argv, char **envp)
 	}
 
 	return (0);
+}
+
+/**
+ * call_commands - calls commands one by one from an an array
+ * @commands: array of commands
+ * Return: void
+ */
+
+void call_commands(char **commands)
+{
+	struct stat st;
+	char **argv, **envp = environ;
+	int state, i = 0;
+
+	while (commands[i] != NULL)
+	{
+		state = 0;
+		argv = split_string(commands[i], " ");
+		if (stat(argv[0], &st) == -1)
+		{
+			if (strcmp(argv[0], "exit") == 0)
+				break;
+			argv[0] = _which(argv[0]);
+			if (argv[0] == NULL)
+			{
+				free(argv);
+				perror("./shell");
+				continue;
+			}
+			else
+				state = 1;
+		}
+		call_child(argv, envp);
+		if (state)
+			free(argv[0]);
+		free(argv);
+		i++;
+	}
 }

@@ -18,12 +18,12 @@ char **split_string(char *s, char *c)
 	if (s == NULL || *s == '\0')
 		return (NULL);
 
-	words[i] = strtok(s, c);
+	words[i] = _strtok(s, c);
 	while (words[i] != NULL)
 	{
 		i++;
 		words = realloc(words, sizeof(*words) * (i + 1));
-		words[i] = strtok(NULL, c);
+		words[i] = _strtok(NULL, c);
 	}
 	return (words);
 }
