@@ -18,22 +18,28 @@ int main(void)
 	char *line;
 	char **commands;
 	size_t n = 0;
+	int broken;
 
 	while (1)
 	{
+		broken = 0;
 		line = NULL;
 		printf("$ ");
 		if (getline(&line, &n, stdin) == -1)
+		{
+			free(line);
 			break;
+		}
 		line = _strtok(line, "\n");
 		if (line == NULL)
 			continue;
 		commands = split_string(line, ";");
-		call_commands(commands);
+		broken = call_commands(commands);
 		free(line);
 		free(commands);
+		if (broken != -1)
+			return (broken);
 	}
-	free(line);
 	return (0);
 }
 
@@ -74,14 +80,14 @@ int call_child(char **argv, char **envp)
 /**
  * call_commands - calls commands one by one from an an array
  * @commands: array of commands
- * Return: void
+ * Return: 1 if loop breaks 0 otherwise
  */
 
-void call_commands(char **commands)
+int call_commands(char **commands)
 {
 	struct stat st;
 	char **argv, **envp = environ;
-	int state, i = 0;
+	int state, i = 0, val = 0;
 
 	while (commands[i] != NULL)
 	{
@@ -90,7 +96,12 @@ void call_commands(char **commands)
 		if (stat(argv[0], &st) == -1)
 		{
 			if (strcmp(argv[0], "exit") == 0)
-				break;
+			{
+				if (argv[1] != NULL)
+					val = exit_atoi(argv[1]);
+				free(argv);
+				return (val);
+			}
 			argv[0] = _which(argv[0]);
 			if (argv[0] == NULL)
 			{
@@ -107,4 +118,5 @@ void call_commands(char **commands)
 		free(argv);
 		i++;
 	}
+	return (-1);
 }
