@@ -24,6 +24,7 @@ char *_which(char *file)
 	{
 		if (paths[i] == NULL)
 		{
+			free(PATH);
 			free(paths);
 			return (NULL);
 		}
