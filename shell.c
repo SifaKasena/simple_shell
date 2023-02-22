@@ -107,7 +107,7 @@ int call_commands(char **commands)
 			{
 				free(argv);
 				perror("./shell");
-				continue;
+				break;
 			}
 			else
 				state = 1;
