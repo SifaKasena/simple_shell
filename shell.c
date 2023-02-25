@@ -24,9 +24,9 @@ int main(void)
 	{
 		broken = 0;
 		line = NULL;
-		printf("$");
 		if (getline(&line, &n, stdin) == -1)
 		{
+			printf("\n");
 			free(line);
 			break;
 		}
