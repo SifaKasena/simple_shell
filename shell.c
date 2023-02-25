@@ -111,7 +111,8 @@ int call_commands(char **commands)
 			else
 				state = 1;
 		}
-		call_child(argv, envp);
+		if (call_child(argv, envp) == 1)
+			return (2);
 		if (state)
 			free(argv[0]);
 		free(argv);
